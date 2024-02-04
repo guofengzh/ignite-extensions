@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.ignite.cache.hibernate;
+package org.apache.ignite.internal.processors.cache.jta;
 
-import jakarta.transaction.Synchronization;
+import org.apache.ignite.configuration.IgniteConfiguration;
 
 /**
- * Tests Hibernate L2 cache with TRANSACTIONAL access mode and {@link Synchronization}
- * instead of XA resource.
+ * Factory JTA integration test using PARTITIONED cache.
  */
-public class HibernateL2CacheTransactionalUseSyncSelfTest extends HibernateL2CacheTransactionalSelfTest {
+public class GridPartitionedCacheJtaFactoryUseSyncSelfTest extends GridPartitionedCacheJtaFactorySelfTest {
     /** {@inheritDoc} */
-    @Override protected boolean useJtaSynchronization() {
-        return true;
+    @Override protected void configureJta(IgniteConfiguration cfg) {
+        super.configureJta(cfg);
+
+        cfg.getTransactionConfiguration().setUseJtaSynchronization(true);
     }
 }

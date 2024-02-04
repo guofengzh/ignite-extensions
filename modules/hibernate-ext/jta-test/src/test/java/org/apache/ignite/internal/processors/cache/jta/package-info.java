@@ -15,17 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.ignite.cache.hibernate;
-
-import jakarta.transaction.Synchronization;
-
 /**
- * Tests Hibernate L2 cache with TRANSACTIONAL access mode and {@link Synchronization}
- * instead of XA resource.
+ * <!-- Package description. -->
+ * Contains internal tests or test related classes and interfaces.
  */
-public class HibernateL2CacheTransactionalUseSyncSelfTest extends HibernateL2CacheTransactionalSelfTest {
-    /** {@inheritDoc} */
-    @Override protected boolean useJtaSynchronization() {
-        return true;
-    }
-}
+
+package org.apache.ignite.internal.processors.cache.jta;

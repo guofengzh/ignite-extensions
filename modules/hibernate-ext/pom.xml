@@ -31,18 +31,68 @@
 
     <artifactId>ignite-hibernate-parent-ext</artifactId>
     <packaging>pom</packaging>
-    <version>5.3.0-SNAPSHOT</version>
+    <version>6.2.0-SNAPSHOT</version>
 
     <properties>
-        <hibernate.core.version>5.3.7.Final</hibernate.core.version>
+        <hibernate.core.version>6.2.7.Final</hibernate.core.version>
+        <java.version>17</java.version>
+        <spring.version>6.0.11</spring.version>
+        <commons-dbcp2-shade.version>9.1.2</commons-dbcp2-shade.version>
+        <h2.version>2.2.224</h2.version>
+        <agroal.version>2.2</agroal.version>
+        <narayana.version>7.0.0.Final</narayana.version>
+        <surefire.version>3.2.5</surefire.version>
+        <junit-jupiter.version>5.10.1</junit-jupiter.version>
+        <!-- optional : if we want to use a junit4 specific version -->
+        <junit.version>4.13.1</junit.version>
     </properties>
-
+	
     <modules>
+        <module>jta-test</module>
         <module>hibernate</module>
         <module>examples</module>
     </modules>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire.version}</version>
+                    <configuration>
+                        <argLine>
+                            -ea
+                            -Xms1024m
+                            -Xmx1024m
+                            -Djava.net.preferIPv4Stack=true
+                            --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED
+                            --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+                            --add-opens=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED
+                            --add-opens=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED
+                            --add-opens=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED
+                            --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
+                            --add-opens=java.base/java.io=ALL-UNNAMED
+                            --add-opens=java.base/java.nio=ALL-UNNAMED
+                            --add-opens=java.base/java.util=ALL-UNNAMED
+                            --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+                            --add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED
+                            --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+                            --add-opens=java.base/java.lang=ALL-UNNAMED
+                            --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+                            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+                            --add-opens=java.base/java.math=ALL-UNNAMED
+                            --add-opens=java.base/java.text=ALL-UNNAMED
+                            --add-opens=java.desktop/java.awt.font=ALL-UNNAMED
+                            --add-opens=java.sql/java.sql=ALL-UNNAMED
+                        </argLine>
+                        <includes>
+                            <include>**/*.java</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

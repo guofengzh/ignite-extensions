@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.UUID;
 import javax.cache.integration.CacheLoaderException;
 import javax.cache.integration.CacheWriterException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.apache.ignite.cache.store.CacheStore;
 import org.apache.ignite.cache.store.CacheStoreAdapter;
 import org.apache.ignite.cache.store.CacheStoreSession;
@@ -29,6 +32,7 @@ import org.apache.ignite.lang.IgniteBiInClosure;
 import org.apache.ignite.resources.CacheStoreSessionResource;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 /**
  * Example of {@link CacheStore} implementation that uses Hibernate
@@ -99,9 +103,14 @@ public class CacheHibernatePersonStore extends CacheStoreAdapter<Long, Person> {
         try {
             int cnt = 0;
 
-            List list = hibSes.createCriteria(Person.class).
-                setMaxResults(entryCnt).
-                list();
+            //List list = hibSes.createCriteria(Person.class).
+            //    setMaxResults(entryCnt).
+            //    list();
+            CriteriaQuery<Person> cr = hibSes.getCriteriaBuilder().createQuery(Person.class);
+            Root<Person> from = cr.from(Person.class);
+            CriteriaQuery<Person> select = cr.select(from);
+            Query<Person> query = hibSes.createQuery(select).setMaxResults(entryCnt);
+            List<Person> list = query.list();
 
             if (list != null) {
                 for (Object obj : list) {

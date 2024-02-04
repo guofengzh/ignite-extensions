@@ -24,12 +24,11 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import javax.naming.NamingException;
 import javax.naming.Reference;
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceUnitUtil;
-import javax.persistence.Query;
-import javax.persistence.SynchronizationType;
-import javax.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceUnitUtil;
+import jakarta.persistence.Query;
+import jakarta.persistence.SynchronizationType;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteException;
@@ -45,11 +44,11 @@ import org.hibernate.SessionBuilder;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.StatelessSessionBuilder;
-import org.hibernate.TypeHelper;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.engine.spi.FilterDefinition;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.metadata.CollectionMetadata;
+import org.hibernate.graph.RootGraph;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
+import org.hibernate.relational.SchemaManager;
 import org.hibernate.stat.Statistics;
 import org.junit.Test;
 
@@ -196,32 +195,37 @@ public class CacheHibernateStoreFactorySelfTest extends GridCommonAbstractTest {
         }
 
         /** {@inheritDoc} */
-        @Override public ClassMetadata getClassMetadata(Class entityCls) {
-            return null;
-        }
+        //@Override public ClassMetadata getClassMetadata(Class entityCls) {
+        //    return null;
+        //}
 
         /** {@inheritDoc} */
-        @Override public ClassMetadata getClassMetadata(String entityName) {
-            return null;
-        }
+        //@Override public ClassMetadata getClassMetadata(String entityName) {
+        //    return null;
+        //}
 
         /** {@inheritDoc} */
-        @Override public CollectionMetadata getCollectionMetadata(String roleName) {
-            return null;
-        }
+        //@Override public CollectionMetadata getCollectionMetadata(String roleName) {
+        //    return null;
+        //}
 
         /** {@inheritDoc} */
-        @Override public Map<String, ClassMetadata> getAllClassMetadata() {
-            return null;
-        }
+        //@Override public Map<String, ClassMetadata> getAllClassMetadata() {
+        //    return null;
+        //}
 
         /** {@inheritDoc} */
-        @Override public Map getAllCollectionMetadata() {
-            return null;
-        }
+        //@Override public Map getAllCollectionMetadata() {
+        //    return null;
+        //}
 
         /** {@inheritDoc} */
         @Override public Statistics getStatistics() {
+            return null;
+        }
+
+        @Override
+        public SchemaManager getSchemaManager() {
             return null;
         }
 
@@ -274,15 +278,20 @@ public class CacheHibernateStoreFactorySelfTest extends GridCommonAbstractTest {
             return null;
         }
 
+        @Override
+        public Set<String> getDefinedFetchProfileNames() {
+            return null;
+        }
+
         /** {@inheritDoc} */
         @Override public boolean containsFetchProfileDefinition(String name) {
             return false;
         }
 
         /** {@inheritDoc} */
-        @Override public TypeHelper getTypeHelper() {
-            return null;
-        }
+        //@Override public TypeHelper getTypeHelper() {
+        //    return null;
+        //}
 
         /** {@inheritDoc} */
         @Override public Reference getReference() throws NamingException {
@@ -291,6 +300,11 @@ public class CacheHibernateStoreFactorySelfTest extends GridCommonAbstractTest {
 
         /** {@inheritDoc} */
         @Override public <T> List<EntityGraph<? super T>> findEntityGraphsByType(Class<T> aClass) {
+            return null;
+        }
+
+        @Override
+        public RootGraph<?> findEntityGraphByName(String s) {
             return null;
         }
 
@@ -314,8 +328,10 @@ public class CacheHibernateStoreFactorySelfTest extends GridCommonAbstractTest {
             return null;
         }
 
-        /** {@inheritDoc} */
-        @Override public CriteriaBuilder getCriteriaBuilder() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override public HibernateCriteriaBuilder getCriteriaBuilder() {
             return null;
         }
 

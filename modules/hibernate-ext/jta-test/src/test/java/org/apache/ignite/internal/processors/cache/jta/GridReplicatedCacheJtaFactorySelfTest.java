@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.ignite.cache.hibernate;
+package org.apache.ignite.internal.processors.cache.jta;
 
-import jakarta.transaction.Synchronization;
+import org.apache.ignite.cache.CacheMode;
+
+import static org.apache.ignite.cache.CacheMode.REPLICATED;
 
 /**
- * Tests Hibernate L2 cache with TRANSACTIONAL access mode and {@link Synchronization}
- * instead of XA resource.
+ * Factory JTA integration test using REPLICATED cache.
  */
-public class HibernateL2CacheTransactionalUseSyncSelfTest extends HibernateL2CacheTransactionalSelfTest {
+public class GridReplicatedCacheJtaFactorySelfTest extends GridPartitionedCacheJtaFactorySelfTest {
     /** {@inheritDoc} */
-    @Override protected boolean useJtaSynchronization() {
-        return true;
+    @Override protected CacheMode cacheMode() {
+        return REPLICATED;
     }
 }

@@ -17,12 +17,16 @@
 
 package org.apache.ignite.cache.hibernate;
 
+import com.arjuna.ats.arjuna.common.CoreEnvironmentBean;
+import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
+import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
+
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.Collections;
 import javax.cache.configuration.Factory;
-import javax.transaction.Synchronization;
-import javax.transaction.TransactionManager;
-import javax.transaction.UserTransaction;
-import org.apache.commons.dbcp.managed.BasicManagedDataSource;
+import jakarta.transaction.*;
+import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.h2.jdbcx.JdbcDataSource;
@@ -35,29 +39,27 @@ import org.hibernate.engine.transaction.jta.platform.internal.AbstractJtaPlatfor
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.resource.transaction.backend.jta.internal.JtaTransactionCoordinatorBuilderImpl;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.jotm.Jotm;
-import org.objectweb.jotm.rmi.RmiLocalConfiguration;
 
 /**
  *
  * Tests Hibernate L2 cache with TRANSACTIONAL access mode (Hibernate and Cache are configured
- * to used the same TransactionManager).
+ * to use the same TransactionManager).
  */
 public class HibernateL2CacheTransactionalSelfTest extends HibernateL2CacheSelfTest {
-    /** */
-    private static Jotm jotm;
 
-    /**
-     */
+    private static final TransactionManager transactionManager =  com.arjuna.ats.jta.TransactionManager.transactionManager();
+    private static final UserTransaction userTransaction = com.arjuna.ats.jta.UserTransaction.userTransaction();
+
     private static class TestJtaPlatform extends AbstractJtaPlatform {
         /** {@inheritDoc} */
+
         @Override protected TransactionManager locateTransactionManager() {
-            return jotm.getTransactionManager();
+            return transactionManager;
         }
 
         /** {@inheritDoc} */
         @Override protected UserTransaction locateUserTransaction() {
-            return jotm.getUserTransaction();
+            return userTransaction;
         }
     }
 
@@ -70,25 +72,19 @@ public class HibernateL2CacheTransactionalSelfTest extends HibernateL2CacheSelfT
 
         /** {@inheritDoc} */
         @Override public TransactionManager create() {
-            return jotm.getTransactionManager();
+            return transactionManager;
         }
     }
 
     /** {@inheritDoc} */
     @Override protected void beforeTestsStarted() throws Exception {
-        jotm = new Jotm(true, false, new RmiLocalConfiguration());
-
         super.beforeTestsStarted();
+        setTxLogDir();
     }
 
     /** {@inheritDoc} */
     @Override protected void afterTestsStopped() throws Exception {
         super.afterTestsStopped();
-
-        if (jotm != null)
-            jotm.stop();
-
-        jotm = null;
     }
 
     /** {@inheritDoc} */
@@ -118,7 +114,7 @@ public class HibernateL2CacheTransactionalSelfTest extends HibernateL2CacheSelfT
 
         BasicManagedDataSource dataSrc = new BasicManagedDataSource(); // JTA-aware data source.
 
-        dataSrc.setTransactionManager(jotm.getTransactionManager());
+        dataSrc.setTransactionManager(transactionManager);
 
         dataSrc.setDefaultAutoCommit(false);
 
@@ -151,5 +147,25 @@ public class HibernateL2CacheTransactionalSelfTest extends HibernateL2CacheSelfT
      */
     protected boolean useJtaSynchronization() {
         return false;
+    }
+
+    /** Helper */
+    private static final String TransactionManagerId = "1";
+
+    private void setTxLogDir() throws Exception {
+        getPopulator(CoreEnvironmentBean.class).setNodeIdentifier(TransactionManagerId);
+        File home = Paths.get("").toAbsolutePath().toFile();;
+        String logDir = new File(home, "transaction-logs").getAbsolutePath();
+        getPopulator(ObjectStoreEnvironmentBean.class).setObjectStoreDir(logDir);
+        getPopulator(ObjectStoreEnvironmentBean.class, "communicationStore").setObjectStoreDir(logDir);
+        getPopulator(ObjectStoreEnvironmentBean.class, "stateStore").setObjectStoreDir(logDir);
+    }
+
+    private <T> T getPopulator(Class<T> beanClass) {
+        return BeanPopulator.getDefaultInstance(beanClass);
+    }
+
+    private <T> T getPopulator(Class<T> beanClass, String name) {
+        return BeanPopulator.getNamedInstance(beanClass, name);
     }
 }
